@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 Implement the work described by the user in the spec or tickets.
 
+Before writing code, check whether any model-invoked domain skill applies to this work — frontend/UI, database, a specific framework or platform — and load it first. The spec tells you what to build; those tell you the house rules for building it.
+
 Use /tdd where possible, at pre-agreed seams.
 
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.

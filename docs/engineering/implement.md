@@ -28,6 +28,14 @@ The idea `implement` runs on is the **seam** — the stable interface a feature 
 
 Around that core it keeps the loop tight — typecheck often, run single test files as it goes, run the whole suite once at the end — then closes out with a review pass and a commit to the current branch.
 
+## House rules first
+
+A spec says what to build. It rarely says how your frontend is expected to look, which query patterns your database punishes, or what your framework considers idiomatic — those are **house rules**, and they usually live in some other skill you've installed.
+
+So before writing any code, `implement` looks for a domain skill that covers the ground this work sits on and loads it. It doesn't carry a list of them; the point is to check rather than to remember, because the set of installed skills changes and a hardcoded list would rot. Expect it to reach past this repo — a UI ticket may well pull in whatever design or framework skill you have to hand.
+
+What it can find this way is the **model-invoked** half of your installed set — the skills an agent is allowed to reach for on its own. User-invoked skills are hidden from it by design, so they stay yours to fire: if one of your own carries house rules for this work, type it before you type `/implement`.
+
 ## Where it fits
 
 `implement` is the build step near the end of the main chain, just before the review:
