@@ -18,6 +18,10 @@ Create a new file under `.scratch/<feature-slug>/` (creating the directory if ne
 
 Read the file at the referenced path. The user will normally pass the path or the issue number directly.
 
+## Commit provenance
+
+Mention known source files in the commit body, for example `Ticket: .scratch/<feature-slug>/issues/<NN>-<slug>.md` and `Spec: .scratch/<feature-slug>/spec.md`. Local markdown has no commit-driven auto-close syntax.
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a file with one **child** file per ticket.

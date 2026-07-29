@@ -12,7 +12,7 @@ npx skills update implement
 
 ## What it does
 
-`implement` builds the work described in a spec or a set of tickets — driving it through test-driven development, typechecking, and the full test suite, then handing off to review and committing to the current branch.
+`implement` builds the work described in a spec or a set of tickets — driving it through test-driven development, typechecking, and the full test suite, then handing off to review and committing to the current branch with any known source work attached.
 
 It does **not** decide what to build. The spec is already settled and the seams are already agreed; `implement` executes that plan rather than reopening it. It is the hands, not the head — the thinking happened upstream.
 
@@ -27,6 +27,12 @@ Reach for it once the work is written down as a spec or split into tickets and y
 The idea `implement` runs on is the **seam** — the stable interface a feature is tested at, chosen before any code is written. It doesn't invent seams mid-build; it uses the ones already picked (during [to-spec](https://aihero.dev/skills-to-spec)) and writes tests against them via [tdd](https://aihero.dev/skills-tdd). Working at pre-agreed seams is what keeps the implementation honest: the tests target something durable, so the code underneath can move without the tests moving.
 
 Around that core it keeps the loop tight — typecheck often, run single test files as it goes, run the whole suite once at the end — then closes out with a review pass and a commit to the current branch.
+
+## Source work travels with the commit
+
+A ticket is provenance, not an entry requirement. When the work came from a known ticket or spec, `implement` carries that reference into the commit message. A tracker item fully delivered by the commit gets the tracker's closing reference, so reaching the default branch can close it automatically; a broader parent spec is mentioned without being closed.
+
+Work that starts from a local spec file records its path instead. Work that exists only in the current conversation still commits normally — `implement` never invents a ticket, guesses an identifier, or stops solely because there is nothing durable to reference.
 
 ## House rules first
 

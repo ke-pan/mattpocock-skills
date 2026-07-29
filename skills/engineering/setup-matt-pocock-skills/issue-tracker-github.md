@@ -33,6 +33,12 @@ Create a GitHub issue.
 
 Run `gh issue view <number> --comments`.
 
+## Commit provenance
+
+For each known issue fully delivered by a commit, add a separate `Closes #<number>` line to the commit body. For an issue in another repository, use `Closes <owner>/<repository>#<number>`. GitHub closes the referenced issue when the commit reaches the default branch.
+
+Mention a broader parent issue or spec without a closing keyword, for example `Spec: #<number>`, unless that item itself is fully delivered by the commit.
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
