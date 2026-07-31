@@ -28,13 +28,16 @@ The leading idea is the **red-green loop**: write one failing test (red), add ju
 
 Two rules keep the tests honest. A good test reads like a specification ("user can checkout with valid cart") and exercises real code paths through the public API, so renaming an internal function never breaks it. And expected values come from an independent source of truth — a known-good literal, a worked example, the spec — never recomputed the way the code computes them, which is how a **tautological** test passes by construction and tells you nothing.
 
-Refactoring only happens once the suite is green; never while red.
+A seam written into a spec or implementation contract is already agreed; an implementation agent uses it without asking you to reconfirm. When no upstream seam exists, `tdd` confirms one before writing the first test.
+
+Refactoring only happens once the suite is green, as bounded cleanup during implementation self-review — never while red.
 
 ## It's working if
 
 - It writes one test, gets it passing, and only then writes the next — not a batch of tests followed by a batch of code.
 - The tests name behaviours, not internals, and would survive an internal rename.
 - Expected values are literals from the spec, not figures derived the same way the code derives them.
+- An agent given a pre-agreed seam starts the loop instead of reopening the decision.
 
 ## Where it fits
 

@@ -12,36 +12,45 @@ npx skills update code-review
 
 ## What it does
 
-`code-review` reviews the diff between `HEAD` and a fixed point you supply — a commit, branch, tag, or merge-base — along two separate axes: **Standards** (does the code follow this repo's documented conventions?) and **Spec** (does it implement what the originating issue or spec asked for?). It runs each axis as its own parallel sub-agent and reports them side by side. It never merges or re-ranks the two sets of findings — keeping them separate is the whole point, because a change can pass one axis and fail the other, and a single blended verdict lets one mask the other.
+`code-review` reviews one committed diff along two independent axes: **Standards** asks whether the change follows the repository's documented conventions; **Spec** asks whether it faithfully implements the originating issue or spec.
+
+Both reviewers are independent of the implementation authors and receive the same immutable base and head commit SHAs. Their verdicts stay separate — a change can pass one axis and fail the other — and a bounded blocker fix goes back only to the reviewer that raised it.
 
 ## When to reach for it
 
-Type `/code-review`, or the agent reaches for it automatically when you ask to review a branch, a PR, work-in-progress changes, or anything "since X".
+Type `/code-review`, or the agent reaches for it automatically when you ask to review a branch, PR, integrated feature, or changes since a known point.
 
-Reach for this when there is a diff to judge against a known-good point and you want the two questions — *is it built right?* and *is it the right thing?* — answered independently. It runs at the end of the build loop; for actually writing the code test-first, use [tdd](https://aihero.dev/skills-tdd), and for building a whole spec into code use [implement](https://aihero.dev/skills-implement), which runs its own `/code-review` pass before committing.
+Reach for it when there is a committed tree to judge against a known-good point. For building the code test-first, use [tdd](https://aihero.dev/skills-tdd); for executing a whole spec or dependency graph, use [implement](https://aihero.dev/skills-implement), which calls for review only after the implementation tree is stable.
 
 ## Prerequisites
 
-The **Spec** axis needs somewhere to find the originating spec — an issue reference in the commit messages, a path you pass in, or a spec under `docs/`/`specs/`. That issue-tracker wiring comes from [setup-matt-pocock-skills](https://aihero.dev/skills-setup-matt-pocock-skills); without a spec the Spec axis simply skips and says so. The **Standards** axis needs nothing set up — it always carries a built-in Fowler smell baseline even in a repo that documents no conventions.
+The Spec axis needs an originating issue or spec. An explicit source supplied by you or the calling workflow wins; otherwise the skill follows commit provenance and the issue-tracker wiring from [setup-matt-pocock-skills](https://aihero.dev/skills-setup-matt-pocock-skills). Without a spec, that axis reports `NOT_RUN` rather than inventing requirements or claiming acceptance.
 
-## Two axes, never merged
+## Immutable range, independent axes
 
-The defining idea is the **two axes**. **Standards** asks whether the diff conforms to how this repo writes code — its `CODING_STANDARDS.md` or `CONTRIBUTING.md`, plus a fixed baseline of ~12 Fowler code smells (Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, …). Two rules keep the baseline safe: a documented repo standard always overrides it, and every smell is a judgement call, never a hard violation. **Spec** asks the orthogonal question — does the code do what the issue or spec actually asked, without missing requirements or smuggling in scope creep?
+The skill resolves symbolic refs such as `main` or `HEAD` to full commit SHAs once, verifies that the supplied base is an ancestor of the head, and gives both reviewers the exact same range and tree SHA. It stops rather than silently replacing a non-ancestor base with a merge-base. Uncommitted changes are reported as excluded: review evidence belongs to committed code, not to a moving worktree.
 
-They run as parallel sub-agents so neither pollutes the other's context, and the final report presents them under separate `## Standards` and `## Spec` headings with a per-axis summary. There is deliberately no single winner across axes.
+The Standards reviewer applies repository instructions plus a Fowler smell baseline. Documented repository rules win; tooling-enforced style is skipped; a smell is a judgement call and cannot block by itself. The Spec reviewer checks missing, partial, incorrect, and materially unrequested behaviour against quoted source requirements.
+
+Each reviewer returns `ACCEPT` or `BLOCKED`, with blockers separated from non-blocking findings. The root presents the axes side by side without blending or reranking them.
+
+## Targeted re-review
+
+When a small fix addresses one blocker, the same reviewer inspects the original finding and only the fix delta. The other axis remains accepted. A full review restarts only when the fix materially changes architecture, shared invariants, or spec semantics.
 
 ## It's working if
 
-- It pins and confirms the fixed point first (`git rev-parse`), failing fast on a bad ref or empty diff rather than inside the sub-agents.
-- Standards and Spec findings arrive in two distinct blocks, each citing its source — a repo standard or baseline smell for one, a quoted spec line for the other.
-- When no spec can be found, the Spec axis reports "no spec available" instead of inventing requirements.
+- The report names full base and head SHAs.
+- Standards and Spec receive the same committed diff and return separate verdicts.
+- Uncommitted work is explicitly excluded.
+- A bounded fix triggers one targeted re-review instead of both full reviews.
 
 ## Where it fits
 
-`code-review` is the review step at the tail of the main build chain:
+`code-review` is the independent review at the tail of the main build chain:
 
 ```txt
 grill-with-docs → to-spec → to-tickets → implement → code-review
 ```
 
-Its closest neighbour is [implement](https://aihero.dev/skills-implement), which drives the build and calls this as its own review pass before committing; upstream, the spec it checks against is produced by [to-spec](https://aihero.dev/skills-to-spec) and [to-tickets](https://aihero.dev/skills-to-tickets). When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
+[implement](https://aihero.dev/skills-implement) stabilises and commits the tree before invoking it; [to-spec](https://aihero.dev/skills-to-spec) supplies the requirements and invariants the Spec axis judges. When you're unsure which flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.

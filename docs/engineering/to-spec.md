@@ -32,6 +32,7 @@ Reach for it once a change has been talked through and the domain language is se
 - **Solution** — the shape of the fix at a high level, before any implementation detail.
 - **User stories** — an extensive, numbered list of the concrete behaviours the change must support, each one independently checkable.
 - **Implementation decisions** — the choices already settled during the conversation, so they aren't relitigated later.
+- **Invariants** — cross-ticket truths, compatibility guarantees, lifecycle distinctions, and ordering constraints every implementation slice must preserve.
 - **Testing decisions** — the seams the feature will be tested at, and what "done" looks like.
 - **Out-of-scope items** — what this change deliberately does *not* cover, to keep the ticket bounded.
 - **Further notes** — anything else worth carrying forward that doesn't fit the sections above.
@@ -46,6 +47,7 @@ That matters for agentic development: a good interface gives tests something dur
 
 - It starts writing the spec instead of asking you a fresh round of questions.
 - It checks the seams with you before writing, and proposes as few as possible.
+- It names cross-ticket invariants explicitly instead of burying them in implementation prose.
 - The spec comes back in your project's domain vocabulary, not generic boilerplate.
 
 ## Where it fits

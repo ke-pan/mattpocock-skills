@@ -56,6 +56,10 @@ Do NOT include specific file paths or code snippets. They may end up being outda
 
 Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
+## Invariants
+
+A list of truths every implementation slice must preserve. State cross-ticket behaviour, compatibility guarantees, lifecycle distinctions, ordering constraints, and meanings that must not be conflated. Phrase each invariant so an implementation agent can tell whether it changed, and name the protecting acceptance assertion where one is already known.
+
 ## Testing Decisions
 
 A list of testing decisions that were made. Include:

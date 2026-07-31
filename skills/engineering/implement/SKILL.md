@@ -1,20 +1,39 @@
 ---
 name: implement
-description: "Implement a piece of work based on a spec or set of tickets."
+description: "Implement one bounded change directly or coordinate a dependent ticket graph in integration waves."
 disable-model-invocation: true
 ---
 
 Implement the work described by the user in the spec or tickets.
 
-Before writing code, check whether any model-invoked domain skill applies to this work — frontend/UI, database, a specific framework or platform — and load it first. The spec tells you what to build; those tell you the house rules for building it.
+## Choose the execution shape
 
-Use /tdd where possible, at pre-agreed seams.
+- **Direct mode** — one bounded ticket or a small spec that fits one agent session. Follow the direct workflow below.
+- **Wave mode** — multiple tickets with blocking edges, or an explicit request for a root agent to coordinate implementation agents. Before doing any implementation work, read and follow [WAVES.md](WAVES.md) in full.
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+## House rules and seams
 
-Once done, use /code-review to review the work.
+Before writing code, check whether any model-invoked domain skill applies — frontend/UI, database, a specific framework or platform — and load it first. The spec tells you what to build; those skills tell you the house rules for building it.
 
-Before committing, preserve provenance for any source work already known:
+Use /tdd where possible. A seam recorded in the spec or an implementation contract is already pre-agreed; do not ask the user to confirm it again.
+
+If an implementation decision or invariant is unresolved, stop before coding and return it to design/specification. Do not let an implementation agent silently settle shared semantics.
+
+## Direct mode
+
+1. Resolve and record the exact base commit before editing.
+2. Drive the behaviour red → green at the pre-agreed seams. Run focused tests and changed-area static checks regularly.
+3. Perform a concise self-review against the acceptance criteria, invariants, scope, and final diff. Make bounded cleanup while the tests are green.
+4. Run the full relevant test suite once.
+5. Commit the work, then confirm the worktree is clean.
+6. Run /code-review against the immutable base and committed head. If a reviewer blocks, make the smallest fix, commit it, rerun affected focused gates and the full relevant suite on the new head, and ask that reviewer to inspect the fix delta.
+
+Review must happen after the implementation is committed because /code-review reviews committed trees.
+Test and review evidence belongs to the exact commit that produced it. Every completed Direct-mode head must have full relevant suite evidence; a later code change invalidates that evidence.
+
+## Commit provenance
+
+Preserve provenance for any source work already known:
 
 - Do not make a ticket or spec a prerequisite. Never create or guess one just to populate the commit message.
 - Mention each known source ticket and spec in the commit body, using its tracker reference, URL, or local path.
@@ -23,4 +42,4 @@ Before committing, preserve provenance for any source work already known:
 
 If there is no durable source item, commit normally without a reference.
 
-Commit your work to the current branch.
+Do not push or change tracker state unless the user explicitly asks. Finish by reporting the commits, gates, clean-tree status, and whether anything was pushed or changed on the tracker.
