@@ -20,7 +20,7 @@ The route most work travels. You have an idea and want it built.
    - **`/prototype`** to answer the question with throwaway code,
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch — is this a multi-session build?**
-   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. Invoke **`/implement` once with the ticket set**: its Wave mode pins an integration base, confirms the current dependency frontier and shared invariants, then gives each unblocked ticket an isolated implementation agent before integrating and reviewing the stable tree.
+   - **Yes** → **`/to-spec`** turns the thread into a semantic and evidence contract: stable acceptance assertions, invariants, stateful boundaries, and proof strength. **`/to-tickets`** then splits that contract into tracer-bullet tickets, assigning every assertion and boundary to an owner while declaring genuine **blocking edges**. Invoke **`/implement` once with the ticket set**: its Wave mode validates that handoff, binds it to current commands, data, and mechanical namespaces, records run-specific decisions and progress in a durable root-owned ledger, then gives each unblocked ticket an isolated implementation agent before integrating and reviewing the stable tree.
    - **No** → **`/implement`** right here in Direct mode, in the same context window.
 
    Either way, **`/implement`** drives **`/tdd`** internally — one red-green slice at a time. Direct mode builds one bounded change; Wave mode coordinates a dependency graph and runs expensive gates at the integrated level. Both commit before closing out with **`/code-review`**, a two-axis independent review (Standards + Spec) of the stable committed diff. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
@@ -30,6 +30,8 @@ The route most work travels. You have an idea and want it built.
 Keep steps 1–3 in **one unbroken context window** — don't compact or clear until after `/to-tickets` — so the grilling, spec, and tickets all build on the same thinking. Start `/implement` in a fresh root context when the planning thread is full. In Wave mode it owns the fresh per-ticket contexts and isolated worktrees; don't launch a separate uncoordinated `/implement` session for each ticket.
 
 The limit on this is the **[smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone)**: the window (~120k tokens on state-of-the-art models) within which the model still reasons sharply. If a session approaches it before `/to-tickets`, don't push on degraded — `/handoff` and continue in a fresh thread.
+
+Wave mode's run ledger protects exact user choices and integrated state if its fresh implementation context is later compacted. It complements the conversation summary; it does not require installing recovery rules in `AGENTS.md` or `CLAUDE.md`.
 
 ## On-ramps
 

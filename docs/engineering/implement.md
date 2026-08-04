@@ -26,15 +26,21 @@ Reach for it once the work is settled and ready to build. Give it one bounded ti
 
 The spec says what can change and what must remain true. Testing **seams** recorded upstream are already agreed, so implementation agents use them without reopening the design. Cross-ticket **invariants** travel into the implementation contracts of every agent that can affect them.
 
-If a shared meaning is still ambiguous, implementation pauses and returns it to design. Parallel agents never get to settle lifecycle, compatibility, or state semantics independently.
+Before each wave, the root validates the upstream handoff: source acceptance assertions have ticket owners, affected invariants and stateful boundaries travel with them, and evidence requirements retain their original strength. It binds that contract to concrete commands and current data, but does not recreate missing design. If a shared meaning is absent or contradictory, implementation returns it to specification or ticketing. Parallel agents never get to settle lifecycle, compatibility, or state semantics independently.
 
 ## Direct mode
 
-Direct mode keeps one bounded change tight: focused red-green cycles, changed-area static checks, a concise self-review, one full relevant suite, and a clean commit. Independent Standards and Spec review happens against that committed tree, never against an invisible working-copy diff.
+Direct mode keeps one bounded change tight. When a source spec or ticket exists, it validates and binds that contract before focused red-green cycles; it does not fill semantic gaps during coding. Changed-area static checks, a concise self-review, one full relevant suite, and a clean commit lead into independent Standards and Spec review against the committed tree, never an invisible working-copy diff.
 
 ## Wave mode
 
 Wave mode is for an existing dependency graph. It records an immutable integration base, computes the currently unblocked **frontier**, and shows you a one-page wave map and invariant checklist before spawning implementation agents.
+
+The root also keeps a compact, durable run ledger for facts that conversation compaction can blur: confirmed choices and their full meaning, the integrated commit, wave status, blockers, and the next safe action. It checks that ledger against Git when resuming instead of treating a generated conversation summary as authoritative. The ledger is not a transcript, and Wave mode does not install repository-wide agent instructions to make it discoverable.
+
+Evidence strength arrives from the spec through the tickets. A synthetic fixture cannot silently stand in for retained production data or a bounded live sample. For stateful work, implementation uses an adversarial checklist to catch a missing crash, concurrency, retry, identity, replay-isolation, or dependency-failure case; it returns missing expected behaviour upstream instead of inventing it.
+
+Before parallel work begins, the root allocates mechanical values for declared namespace needs such as migration versions, contract identifiers, CLI commands, and artifact paths. Product-facing names remain upstream decisions. Reasoning effort follows semantic risk rather than ticket size, with the highest effort reserved for concurrency, crash consistency, destructive migration rehearsals, and counterfactual replay.
 
 Every ticket gets its own worktree, ownership boundary, acceptance criteria, focused gates, reasoning effort, and clean-commit requirement. Ticket agents do not each run the repository-wide suite or independent review. The root integrates one complete wave, runs the full relevant gates once, and bases the next wave on the newly integrated commit.
 

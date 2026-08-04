@@ -17,16 +17,21 @@ Before writing code, check whether any model-invoked domain skill applies — fr
 
 Use /tdd where possible. A seam recorded in the spec or an implementation contract is already pre-agreed; do not ask the user to confirm it again.
 
+Treat a known source spec and ticket as the semantic and evidence contract. Validate it, then bind it to current commands, data, and repository state; do not recreate missing acceptance meanings, invariants, stateful outcomes, or evidence requirements inside implementation.
+
 If an implementation decision or invariant is unresolved, stop before coding and return it to design/specification. Do not let an implementation agent silently settle shared semantics.
+
+When the user resolves one, record the exact choice, its affected scope, and what it supersedes before resuming. In Wave mode, keep that record in the durable run ledger defined in `WAVES.md`.
 
 ## Direct mode
 
 1. Resolve and record the exact base commit before editing.
-2. Drive the behaviour red → green at the pre-agreed seams. Run focused tests and changed-area static checks regularly.
-3. Perform a concise self-review against the acceptance criteria, invariants, scope, and final diff. Make bounded cleanup while the tests are green.
-4. Run the full relevant test suite once.
-5. Commit the work, then confirm the worktree is clean.
-6. Run /code-review against the immutable base and committed head. If a reviewer blocks, make the smallest fix, commit it, rerun affected focused gates and the full relevant suite on the new head, and ask that reviewer to inspect the fix delta.
+2. Validate any known source contract and bind its acceptance, invariant, stateful-boundary, and evidence requirements to exact focused checks. Return semantic gaps upstream instead of filling them here.
+3. Drive the behaviour red → green at the pre-agreed seams. Run focused tests and changed-area static checks regularly.
+4. Perform a concise self-review against the acceptance criteria, invariants, scope, evidence requirements, and final diff. Make bounded cleanup while the tests are green.
+5. Run the full relevant test suite once.
+6. Commit the work, then confirm the worktree is clean.
+7. Run /code-review against the immutable base and committed head. If a reviewer blocks, make the smallest fix, commit it, rerun affected focused gates and the full relevant suite on the new head, and ask that reviewer to inspect the fix delta.
 
 Review must happen after the implementation is committed because /code-review reviews committed trees.
 Test and review evidence belongs to the exact commit that produced it. Every completed Direct-mode head must have full relevant suite evidence; a later code change invalidates that evidence.
