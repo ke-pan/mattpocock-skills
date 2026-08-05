@@ -11,6 +11,8 @@ Implement the work described by the user in the spec or tickets.
 - **Direct mode** — one bounded ticket or a small spec that fits one agent session. Follow the direct workflow below.
 - **Wave mode** — multiple tickets with blocking edges, or an explicit request for a root agent to coordinate implementation agents. Before doing any implementation work, read and follow [WAVES.md](WAVES.md) in full.
 
+A Wave-mode ticket worker is not a nested Direct-mode invocation. The root's ticket contract is its complete execution procedure: it may use model-invoked domain skills and `/tdd`, but it must not invoke `/implement` or `/code-review`. Direct mode applies only when the human invokes `/implement` for a bounded change outside an active Wave run.
+
 ## House rules and seams
 
 Before writing code, check whether any model-invoked domain skill applies — frontend/UI, database, a specific framework or platform — and load it first. The spec tells you what to build; those skills tell you the house rules for building it.
@@ -34,6 +36,7 @@ When the user resolves one, record the exact choice, its affected scope, and wha
 7. Run /code-review against the immutable base and committed head. If a reviewer blocks, make the smallest fix, commit it, rerun affected focused gates and the full relevant suite on the new head, and ask that reviewer to inspect the fix delta.
 
 Review must happen after the implementation is committed because /code-review reviews committed trees.
+The Direct-mode implementation agent schedules independent reviewers through `/code-review`; it does not review its own work as either independent axis.
 Test and review evidence belongs to the exact commit that produced it. Every completed Direct-mode head must have full relevant suite evidence; a later code change invalidates that evidence.
 
 ## Commit provenance

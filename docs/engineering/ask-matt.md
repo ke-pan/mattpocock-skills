@@ -26,7 +26,7 @@ Reach for it whenever you're unsure which skill or flow a situation calls for: y
 
 The idea `ask-matt` gives you to think with is the **flow** — a path *through* the skills rather than a single one. Most work runs along one **main flow** (idea → ship: grill → spec → tickets → implement → review), two **on-ramps** merge onto it (a triage lane for incoming bugs and requests; a codebase-health lane that generates ideas), and everything else is a **standalone** you reach for on its own. Ask a question and you get placed on the right flow, at the right step — not just handed a tool.
 
-At implementation, that flow branches again: one bounded change uses `implement` Direct mode; a dependency graph uses its Wave mode. Wave mode coordinates the current unblocked frontier from one root session, rather than asking you to launch unrelated implementation sessions ticket by ticket.
+At implementation, that flow branches again: one bounded change uses `implement` Direct mode; a dependency graph uses its Wave mode. Wave mode coordinates the current unblocked frontier from one root session, rather than asking you to launch unrelated implementation sessions ticket by ticket. Its ticket agents execute root-owned contracts instead of recursively invoking `implement`; the root reviews each integrated wave delta and the final cumulative range.
 
 ## Where it fits
 

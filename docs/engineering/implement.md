@@ -40,11 +40,11 @@ The root also keeps a compact, durable run ledger for facts that conversation co
 
 Evidence strength arrives from the spec through the tickets. A synthetic fixture cannot silently stand in for retained production data or a bounded live sample. For stateful work, implementation uses an adversarial checklist to catch a missing crash, concurrency, retry, identity, replay-isolation, or dependency-failure case; it returns missing expected behaviour upstream instead of inventing it.
 
-Before parallel work begins, the root allocates mechanical values for declared namespace needs such as migration versions, contract identifiers, CLI commands, and artifact paths. Product-facing names remain upstream decisions. Reasoning effort follows semantic risk rather than ticket size, with the highest effort reserved for concurrency, crash consistency, destructive migration rehearsals, and counterfactual replay.
+Before parallel work begins, the root allocates mechanical values for declared namespace needs such as migration versions, contract identifiers, CLI commands, and artifact paths. Product-facing names remain upstream decisions. Reasoning effort follows semantic risk rather than ticket size, with the highest effort reserved for concurrency, crash consistency, destructive migration rehearsals, and counterfactual replay. Every implementation and review dispatch carries that effort explicitly while keeping the current model unless an override is required; a full-history fork or inherited effort is an invalid dispatch.
 
-Every ticket gets its own worktree, ownership boundary, acceptance criteria, focused gates, reasoning effort, and clean-commit requirement. Ticket agents do not each run the repository-wide suite or independent review. The root integrates one complete wave, runs the full relevant gates once, and bases the next wave on the newly integrated commit.
+Every ticket gets its own fresh context, worktree, ownership boundary, acceptance criteria, focused gates, reasoning effort, and clean-commit requirement. A ticket agent is a Wave worker, not a nested `/implement` Direct-mode run: it may use TDD and domain skills, but it does not launch independent review. The root integrates one complete wave, runs the full relevant gates once, and bases the next wave on the accepted integrated commit.
 
-Once the tree is stable, one independent Standards reviewer and one independent Spec reviewer inspect the same immutable range. Expensive benchmarks and migration rehearsals wait until those reviews accept.
+Once the tree is stable, one independent Standards reviewer and one independent Spec reviewer inspect that wave's immutable delta from the previous accepted head. The original implementation base remains fixed for provenance and one final cumulative review, instead of being reread after every wave. Expensive benchmarks and migration rehearsals wait until the applicable reviews accept.
 
 ## Source work travels with the commit
 

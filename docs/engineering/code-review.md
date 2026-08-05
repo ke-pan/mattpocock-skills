@@ -14,7 +14,7 @@ npx skills update code-review
 
 `code-review` reviews one committed diff along two independent axes: **Standards** asks whether the change follows the repository's documented conventions; **Spec** asks whether it faithfully implements the originating issue or spec.
 
-Both reviewers are independent of the implementation authors and receive the same immutable base and head commit SHAs. Their verdicts stay separate — a change can pass one axis and fail the other — and a bounded blocker fix goes back only to the reviewer that raised it.
+Both reviewers are independent of the implementation authors and receive the same immutable base and head commit SHAs in fresh contexts. Each dispatch carries an explicitly classified reasoning effort while retaining the current model unless an override is required. Their verdicts stay separate — a change can pass one axis and fail the other — and a bounded blocker fix goes back only to the reviewer that raised it.
 
 ## When to reach for it
 

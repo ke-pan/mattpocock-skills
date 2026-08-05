@@ -18,7 +18,7 @@ Use waves to execute a dependency graph without letting concurrency outrun integ
 Keep integration under the root agent's ownership.
 
 1. Load the full spec, current ticket state, blocking edges, relevant ADRs, and repository instructions.
-2. Require a clean integration worktree. Resolve the integration target and record its exact commit as `implementation_base_sha`.
+2. Require a clean integration worktree. Resolve the integration target and record its exact commit as the immutable `implementation_base_sha`. Initialize the first `wave_base_sha` to the same commit; later waves advance `wave_base_sha` without rewriting `implementation_base_sha`.
 3. Establish the durable run ledger described below.
 4. Compute the current **frontier**: open tickets whose blockers are all integrated. Put only frontier tickets in the next wave. A ticket blocked by active work belongs to a later wave.
 5. Run a handoff gate on every frontier ticket. Verify that it carries its source acceptance assertions, every affected invariant, each declared stateful boundary and expected outcome, required evidence classes and authorization boundaries, pre-agreed seams, and genuine blocking edges. Verify that the upstream artifacts do not assign conflicting meanings. If anything semantic is missing or contradictory, return it to specification or ticketing; do not repair the design inside implementation.
@@ -37,7 +37,8 @@ Keep integration under the root agent's ownership.
     - `medium` for bounded local UI, API, or schema-neutral work without shared persistent semantics;
     - `high` for external integrations, solver behaviour, lifecycle state, retention, additive compatibility migrations, or cross-module behaviour;
     - `xhigh` for concurrency, crash consistency, destructive migration rehearsal, counterfactual replay, or several interacting invariants.
-11. Plan harness capacity so the root remains available and Stable-tree review can use independent Spec and Standards reviewers. Only the root schedules those reviewers.
+11. Classify root-scheduled implementation, repair, Spec-review, and Standards-review agents individually. A prose classification is not a runtime setting: every spawn must pass the selected `reasoning_effort` explicitly.
+12. Plan harness capacity so the root remains available and Stable-tree review can use independent Spec and Standards reviewers. Only the root schedules those reviewers.
 
 For access or compliance tickets, verify that the inherited contract keeps technical capability, price, terms or authorization, permitted credentials, bounded-validation limits, and production activation permission separate. Enforce those boundaries; do not reinterpret them during implementation.
 
@@ -79,7 +80,8 @@ Keep run-specific truth outside the conversation history. Before the first spawn
 
 The root agent is the sole writer. Record:
 
-- the spec or ticket set, integration target, `implementation_base_sha`, and latest verified `integrated_sha`;
+- the spec or ticket set, integration target, immutable `implementation_base_sha`, current `wave_base_sha`, latest verified `integrated_sha`, and latest accepted wave head;
+- every dispatch's agent handle, role or ticket, `fork_turns`, model override or inherited-model marker, planned reasoning effort, and explicit spawned reasoning effort;
 - confirmed decisions as append-only entries with the full chosen meaning, affected scope, original user confirmation, and any decision they supersede;
 - wave and ticket status with bases, commit SHAs, gates, and review verdicts;
 - the inherited source-to-ticket coverage, runtime evidence bindings, declared stateful boundaries, and shared namespace reservations;
@@ -95,9 +97,19 @@ After context compaction or a resumed session, verify the ledger's SHA and phase
 
 Create one isolated worktree and branch per ticket from the wave's exact base commit. Launch only contracts that can run independently, up to the harness's useful concurrency.
 
+Before allowing a spawned agent to work, enforce this dispatch gate:
+
+1. Use `fork_turns: "none"` by default and pass the complete narrow contract below. Use a small positive turn count only when the contract depends on an immediately preceding user decision. Never use `fork_turns: "all"`.
+2. Omit the model override unless the user, repository, or task requires a different model; omission deliberately uses the current model resolution.
+3. Pass `reasoning_effort` explicitly and require it to equal the effort classified for that agent. Never rely on inherited effort.
+4. Record the exact spawn arguments and returned agent handle in the run ledger. If `fork_turns` is unbounded, effort is absent, or effort mismatches the plan, interrupt the invalid dispatch and relaunch it before accepting work.
+
+A Wave ticket agent executes this contract directly. Do not pass it the original user `/implement` invocation or ask it to select an execution shape; it is not a nested Direct-mode run. It may invoke `/tdd` and applicable model-invoked domain skills, but the root alone invokes `/code-review` after integration.
+
 Give every agent this narrow contract:
 
 ```text
+Execution shape: Wave ticket worker; do not invoke /implement or /code-review
 Ticket:
 Base commit:
 Worktree:
@@ -122,6 +134,7 @@ Required return:
 - `git status --porcelain` showing a clean worktree
 
 Do not:
+- invoke /implement or /code-review
 - edit outside the owned area; stop and report if the contract cannot be completed inside it
 - weaken the required evidence class or claim an unreserved shared identifier
 - integrate another ticket
@@ -136,7 +149,7 @@ Pass only the invariants relevant to that ticket, but never omit a cross-ticket 
 
 Each implementation agent must:
 
-1. Load applicable model-invoked domain skills.
+1. Load applicable model-invoked domain skills. Do not load the user-invoked `/implement` skill or launch `/code-review`.
 2. Drive focused tests red → green at the contract's seams.
 3. Execute every mapped acceptance and declared stateful-seam check, or report why the contract cannot supply its required evidence.
 4. Run changed-area lint, format, typecheck, and focused tests.
@@ -164,7 +177,7 @@ Update the run ledger with the integrated commits, gate evidence, and new `integ
 
 Keep tool output proportional to the decision being made. Retain verbose logs or structured reports as artifacts when needed, but return concise pass/fail summaries, counts, elapsed time, hashes, and artifact paths to the root instead of streaming unbounded records into context.
 
-Do not start a dependent ticket until the integration target contains the stable wave. Base every next-wave worktree on the new `integrated_sha`.
+Do not start a dependent ticket until the integration target contains an accepted wave. After Stable-tree review accepts the wave, set its final head as the accepted wave head, advance `wave_base_sha` to it, and base every next-wave worktree on that commit.
 
 Test and review evidence belongs to the exact commit that produced it. A code change invalidates later-stage evidence for the old tree; rerun the gate for the stage that changed. The final target must always carry fresh repository-wide gate evidence.
 
@@ -172,11 +185,13 @@ Test and review evidence belongs to the exact commit that produced it. A code ch
 
 After every implementation wave and ordinary gate is stable:
 
-1. Pin `review_base_sha` to the original implementation base and `review_head_sha` to the final integrated commit.
-2. Run /code-review once, supplying those immutable SHAs and requiring reviewers who did not author the implementation. Let /code-review launch the Spec and Standards reviewers concurrently.
+1. Pin `review_base_sha` to this wave's immutable `wave_base_sha` and `review_head_sha` to the final integrated commit. Do not use the original `implementation_base_sha` for every wave.
+2. Run /code-review once, supplying those immutable SHAs, an explicit reasoning effort for each axis, and reviewers who did not author the implementation. Let /code-review launch the Spec and Standards reviewers concurrently under its fresh-context dispatch gate.
 3. Supply any confirmed ledger decisions that affect the reviewed behaviour but are not yet reflected in the spec or tickets.
 4. Require the reviewers to inspect the inherited source-to-ticket coverage, runtime evidence bindings, and declared stateful seams as well as the diff.
 5. Keep the root review focused on integration seams, shared namespaces, commit provenance, and disagreement between reviewers.
+
+When both axes accept, record `review_head_sha` as the accepted wave head and advance `wave_base_sha` to it for the next frontier. Keep `implementation_base_sha` unchanged for final cumulative review and provenance.
 
 When a reviewer blocks:
 
@@ -204,12 +219,14 @@ When the inherited evidence contract requires retained production data, use the 
 
 After review and expensive acceptance:
 
-1. Advance the user-approved final target to the accepted commit.
-2. Run one final repository-wide gate on the final target.
-3. Confirm every acceptance criterion has the required evidence and every declared stateful boundary has a result.
-4. Audit every commit after `implementation_base_sha` for known source provenance.
-5. Confirm the target and every retained worktree are clean and contain no unexpected artifacts.
-6. Mark the run ledger complete and retain or archive it according to the repository's scratch policy.
-7. Report the implementation base, integrated commits, review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker.
+1. Run one final cumulative /code-review from immutable `implementation_base_sha` to the final accepted wave head, with explicitly classified reasoning effort for both axes. If that exact range and tree already received both accepted verdicts, reuse them instead of duplicating the review.
+2. Repair any blocker with the bounded-fix and targeted-re-review rules, rerunning ordinary or expensive evidence invalidated by the fix.
+3. Advance the user-approved final target to the accepted commit.
+4. Run one final repository-wide gate on the final target.
+5. Confirm every acceptance criterion has the required evidence and every declared stateful boundary has a result.
+6. Audit every commit after `implementation_base_sha` for known source provenance.
+7. Confirm the target and every retained worktree are clean and contain no unexpected artifacts.
+8. Mark the run ledger complete and retain or archive it according to the repository's scratch policy.
+9. Report the implementation base, per-wave ranges and integrated commits, final cumulative review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker. Include `implicit_effort_spawn_count` and `full_history_fork_count`; both must be zero for a conforming run.
 
 Never push or mutate tracker state without explicit user authorization.

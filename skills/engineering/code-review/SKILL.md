@@ -74,6 +74,10 @@ Repository standards override the baseline. Tool-enforced style is outside revie
 
 Launch Standards and Spec reviewers who did not author the reviewed implementation, concurrently using the harness's available sub-agent mechanism. Give both the same `review_base_sha`, `review_head_sha`, `review_head_tree_sha`, diff command, and commit list. Record each reviewer identity or session handle for possible follow-up.
 
+Classify each axis's reasoning effort before dispatch. Use an effort supplied by the calling workflow when present; otherwise use `medium` for a bounded local diff, `high` for lifecycle, retention, additive migrations, external integration, or cross-module behaviour, and `xhigh` only for concurrency, crash consistency, destructive migration rehearsal, counterfactual replay, or several interacting invariants.
+
+Dispatch each reviewer with `fork_turns: "none"` and the complete review brief, and pass its classified `reasoning_effort` explicitly. Omit the model override unless the user, repository, or calling workflow requires one. Never use a full-history fork or inherited effort. Record the exact spawn arguments with the reviewer handle; if the effort is absent or mismatched, interrupt and relaunch before accepting a verdict.
+
 Give the **Standards reviewer**:
 
 - every standards-source path and applicable rule;
