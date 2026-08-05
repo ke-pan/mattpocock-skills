@@ -23,7 +23,8 @@ Keep integration under the root agent's ownership.
 4. Compute the current **frontier**: open tickets whose blockers are all integrated. Put only frontier tickets in the next wave. A ticket blocked by active work belongs to a later wave.
 5. Run a handoff gate on every frontier ticket. Verify that it carries its source acceptance assertions, every affected invariant, each declared stateful boundary and expected outcome, required evidence classes and authorization boundaries, pre-agreed seams, and genuine blocking edges. Verify that the upstream artifacts do not assign conflicting meanings. If anything semantic is missing or contradictory, return it to specification or ticketing; do not repair the design inside implementation.
 6. Bind the inherited contract to the current repository: resolve exact focused commands for each acceptance and stateful seam; identify current data paths, schema versions, compatibility versions, and hashes required by retained-data evidence; and note any codebase drift that makes the upstream contract impossible. Do not weaken or replace an evidence class during binding.
-7. Use this adversarial checklist to detect omissions in stateful work, not to invent expected behaviour. For every applicable item, confirm that the spec or ticket already declares the outcome, then bind it to an executable check:
+7. Classify every frontier ticket's TDD applicability before dispatch. Use `required` for any executable behaviour, including migrations, contracts, bug fixes, and integration repairs. Use `not_applicable` only when no executable seam exists, such as pure documentation or inert metadata, and record the root-owned reason before spawning. Ticket agents cannot create or broaden their own exceptions.
+8. Use this adversarial checklist to detect omissions in stateful work, not to invent expected behaviour. For every applicable item, confirm that the spec or ticket already declares the outcome, then bind it to an executable check:
    - crash between persistent writes;
    - concurrent publication of the same key or revision;
    - retry, recovery, and cleanup ownership;
@@ -31,14 +32,14 @@ Keep integration under the root agent's ownership.
    - actual versus counterfactual state isolation;
    - partial and total dependency failure;
    - semantic failure after transport success.
-8. Reserve the mechanical values for declared shared namespace needs: migration and schema versions, contract identifiers, ports, CLI commands, asset names, and artifact paths. The root resolves mechanical collisions; when a resolution changes a public interface or product semantics, return it to the spec or user. Ticket agents do not claim unreserved shared identifiers independently.
-9. Check whether the wave can be given clear ownership. When two tickets cannot run without negotiating the same semantics or files, pause for re-slicing or a real dependency decision; never invent a blocker just to make scheduling easier.
-10. Classify reasoning effort by semantic risk, not ticket size:
+9. Reserve the mechanical values for declared shared namespace needs: migration and schema versions, contract identifiers, ports, CLI commands, asset names, and artifact paths. The root resolves mechanical collisions; when a resolution changes a public interface or product semantics, return it to the spec or user. Ticket agents do not claim unreserved shared identifiers independently.
+10. Check whether the wave can be given clear ownership. When two tickets cannot run without negotiating the same semantics or files, pause for re-slicing or a real dependency decision; never invent a blocker just to make scheduling easier.
+11. Classify reasoning effort by semantic risk, not ticket size:
     - `medium` for bounded local UI, API, or schema-neutral work without shared persistent semantics;
     - `high` for external integrations, solver behaviour, lifecycle state, retention, additive compatibility migrations, or cross-module behaviour;
     - `xhigh` for concurrency, crash consistency, destructive migration rehearsal, counterfactual replay, or several interacting invariants.
-11. Classify root-scheduled implementation, repair, Spec-review, and Standards-review agents individually. A prose classification is not a runtime setting: every spawn must pass the selected `reasoning_effort` explicitly.
-12. Plan harness capacity so the root remains available and Stable-tree review can use independent Spec and Standards reviewers. Only the root schedules those reviewers.
+12. Classify root-scheduled implementation, repair, Spec-review, and Standards-review agents individually. A prose classification is not a runtime setting: every spawn must pass the selected `reasoning_effort` explicitly.
+13. Plan harness capacity so the root remains available and Stable-tree review can use independent Spec and Standards reviewers. Only the root schedules those reviewers.
 
 For access or compliance tickets, verify that the inherited contract keeps technical capability, price, terms or authorization, permitted credentials, bounded-validation limits, and production activation permission separate. Enforce those boundaries; do not reinterpret them during implementation.
 
@@ -53,6 +54,9 @@ Run ledger: <path>
 
 Wave N:
 - <ticket and delivery>
+
+Dispatch:
+- <ticket> — fork <none or bounded turns>; effort <medium|high|xhigh>; TDD <required at confirmed seams | not_applicable because no executable seam>
 
 Blocked for later:
 - <ticket> by <blocker>
@@ -82,6 +86,7 @@ The root agent is the sole writer. Record:
 
 - the spec or ticket set, integration target, immutable `implementation_base_sha`, current `wave_base_sha`, latest verified `integrated_sha`, and latest accepted wave head;
 - every dispatch's agent handle, role or ticket, `fork_turns`, model override or inherited-model marker, planned reasoning effort, and explicit spawned reasoning effort;
+- every ticket's root-classified TDD applicability, any pre-dispatch exception reason, confirmed seams, and exact RED/GREEN evidence for each completed vertical slice;
 - confirmed decisions as append-only entries with the full chosen meaning, affected scope, original user confirmation, and any decision they supersede;
 - wave and ticket status with bases, commit SHAs, gates, and review verdicts;
 - the inherited source-to-ticket coverage, runtime evidence bindings, declared stateful boundaries, and shared namespace reservations;
@@ -102,9 +107,10 @@ Before allowing a spawned agent to work, enforce this dispatch gate:
 1. Use `fork_turns: "none"` by default and pass the complete narrow contract below. Use a small positive turn count only when the contract depends on an immediately preceding user decision. Never use `fork_turns: "all"`.
 2. Omit the model override unless the user, repository, or task requires a different model; omission deliberately uses the current model resolution.
 3. Pass `reasoning_effort` explicitly and require it to equal the effort classified for that agent. Never rely on inherited effort.
-4. Record the exact spawn arguments and returned agent handle in the run ledger. If `fork_turns` is unbounded, effort is absent, or effort mismatches the plan, interrupt the invalid dispatch and relaunch it before accepting work.
+4. Require the contract to carry root-classified TDD applicability, confirmed seams, and any pre-dispatch exception. If executable behaviour is marked `not_applicable`, stop and repair the contract before spawning.
+5. Record the exact spawn arguments and returned agent handle in the run ledger. If `fork_turns` is unbounded, effort is absent, effort mismatches the plan, or TDD applicability is missing, interrupt the invalid dispatch and relaunch it before accepting work.
 
-A Wave ticket agent executes this contract directly. Do not pass it the original user `/implement` invocation or ask it to select an execution shape; it is not a nested Direct-mode run. It may invoke `/tdd` and applicable model-invoked domain skills, but the root alone invokes `/code-review` after integration.
+A Wave ticket agent executes this contract directly. Do not pass it the original user `/implement` invocation or ask it to select an execution shape; it is not a nested Direct-mode run. When TDD is required, it must invoke `/tdd` before its first implementation edit. It may invoke other applicable model-invoked domain skills, but the root alone invokes `/code-review` after integration.
 
 Give every agent this narrow contract:
 
@@ -122,6 +128,9 @@ Declared stateful boundaries:
 Inherited evidence contract:
 Runtime test/evidence bindings:
 Runtime namespace reservations:
+TDD applicability: required | not_applicable
+TDD exception reason: none | <root-owned pre-dispatch reason>
+Confirmed test seams:
 Focused test commands:
 Changed-area static checks:
 Reasoning effort: medium | high | xhigh
@@ -129,12 +138,14 @@ Reasoning effort: medium | high | xhigh
 Required return:
 - commit SHA and concise commit summary
 - commands run and their results
+- for every required TDD slice: seam, exact RED command and intended behavioural failure, then exact GREEN command and result
 - result for every mapped acceptance criterion and stateful seam
 - concise self-review
 - `git status --porcelain` showing a clean worktree
 
 Do not:
 - invoke /implement or /code-review
+- skip /tdd when required or declare a new TDD exception
 - edit outside the owned area; stop and report if the contract cannot be completed inside it
 - weaken the required evidence class or claim an unreserved shared identifier
 - integrate another ticket
@@ -149,17 +160,18 @@ Pass only the invariants relevant to that ticket, but never omit a cross-ticket 
 
 Each implementation agent must:
 
-1. Load applicable model-invoked domain skills. Do not load the user-invoked `/implement` skill or launch `/code-review`.
-2. Drive focused tests red → green at the contract's seams.
-3. Execute every mapped acceptance and declared stateful-seam check, or report why the contract cannot supply its required evidence.
-4. Run changed-area lint, format, typecheck, and focused tests.
-5. Self-review the acceptance criteria, invariants, scope, evidence strength, and diff; make bounded cleanup while green.
-6. Inspect tracked and untracked changes before staging. Do not commit or leave dependency links, lockfiles, generated reports, or build output unless the ticket requires them.
-7. Commit with source provenance and return a clean worktree.
+1. If TDD is `required`, load `/tdd` before the first implementation edit, list the confirmed seams, and work in vertical slices. Load other applicable model-invoked domain skills as needed. Do not load the user-invoked `/implement` skill or launch `/code-review`.
+2. For every required slice, run and retain an exact RED command whose failure demonstrates the intended missing behaviour, then the exact GREEN command and passing result. A syntax, setup, unrelated, or already-green failure is not valid RED evidence.
+3. If TDD is `not_applicable`, cite the unchanged root-owned pre-dispatch exception and make no executable-behaviour change. Stop if implementation reveals an executable seam; only the root may reclassify and redispatch the contract.
+4. Execute every mapped acceptance and declared stateful-seam check, or report why the contract cannot supply its required evidence.
+5. Run changed-area lint, format, typecheck, and focused tests.
+6. Self-review the acceptance criteria, invariants, scope, evidence strength, TDD evidence, and diff; make bounded cleanup while green.
+7. Inspect tracked and untracked changes before staging. Do not commit or leave dependency links, lockfiles, generated reports, or build output unless the ticket requires them.
+8. Commit with source provenance and return a clean worktree.
 
 Do not run the repository-wide suite in every ticket worktree. Put it in a ticket contract only when that ticket changes a high-risk shared seam.
 
-The root verifies the returned SHA, inherited coverage, runtime evidence bindings, test evidence, commit boundary, source provenance, unexpected files, and clean worktree instead of accepting the handoff on trust. Fix commits must reference their known source ticket or spec even when they do not close it.
+The root verifies the returned SHA, inherited coverage, runtime evidence bindings, TDD classification, per-slice RED/GREEN evidence, commit boundary, source provenance, unexpected files, and clean worktree instead of accepting the handoff on trust. Reject a required-TDD handoff with missing or invalid RED evidence, and reject a `not_applicable` handoff that changed executable behaviour. Fix commits must reference their known source ticket or spec even when they do not close it.
 
 ## Wave integration
 
@@ -170,7 +182,7 @@ Wait for every ticket in the wave to pass its ticket gate.
 3. Recheck shared namespace reservations for collisions in the returned diffs.
 4. Fast-forward when possible; otherwise cherry-pick the reviewed ticket commits into the integration target in a stable order. Resolve cross-ticket conflicts and integration seams once, under the root agent.
 5. Run the full relevant backend/frontend gates once on the integrated tree.
-6. Fix only integration failures here; keep new product behaviour in tickets.
+6. Fix only integration failures here; keep new product behaviour in tickets. Treat a failing integration gate as RED evidence and follow `/tdd` before making an executable repair.
 7. Commit any integration fix with source provenance and record the stable result as `integrated_sha`.
 
 Update the run ledger with the integrated commits, gate evidence, and new `integrated_sha` before dispatching the next wave.
@@ -195,7 +207,7 @@ When both axes accept, record `review_head_sha` as the accepted wave head and ad
 
 When a reviewer blocks:
 
-1. Assign the smallest bounded fix.
+1. Assign the smallest bounded fix. When it changes executable behaviour, require `/tdd` and exact RED/GREEN evidence under the same ticket gate.
 2. Commit it and rerun affected ordinary gates.
 3. Ask the same reviewer to inspect the blocked finding and only the resulting delta.
 
@@ -227,6 +239,6 @@ After review and expensive acceptance:
 6. Audit every commit after `implementation_base_sha` for known source provenance.
 7. Confirm the target and every retained worktree are clean and contain no unexpected artifacts.
 8. Mark the run ledger complete and retain or archive it according to the repository's scratch policy.
-9. Report the implementation base, per-wave ranges and integrated commits, final cumulative review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker. Include `implicit_effort_spawn_count` and `full_history_fork_count`; both must be zero for a conforming run.
+9. Report the implementation base, per-wave ranges and integrated commits, final cumulative review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker. Include `implicit_effort_spawn_count`, `full_history_fork_count`, `missing_red_evidence_count`, and every TDD exception; all three counts must be zero for a conforming run.
 
 Never push or mutate tracker state without explicit user authorization.

@@ -11,13 +11,15 @@ Implement the work described by the user in the spec or tickets.
 - **Direct mode** — one bounded ticket or a small spec that fits one agent session. Follow the direct workflow below.
 - **Wave mode** — multiple tickets with blocking edges, or an explicit request for a root agent to coordinate implementation agents. Before doing any implementation work, read and follow [WAVES.md](WAVES.md) in full.
 
-A Wave-mode ticket worker is not a nested Direct-mode invocation. The root's ticket contract is its complete execution procedure: it may use model-invoked domain skills and `/tdd`, but it must not invoke `/implement` or `/code-review`. Direct mode applies only when the human invokes `/implement` for a bounded change outside an active Wave run.
+A Wave-mode ticket worker is not a nested Direct-mode invocation. The root's ticket contract is its complete execution procedure: it must invoke `/tdd` for executable behaviour and may use other model-invoked domain skills, but it must not invoke `/implement` or `/code-review`. Direct mode applies only when the human invokes `/implement` for a bounded change outside an active Wave run.
 
 ## House rules and seams
 
 Before writing code, check whether any model-invoked domain skill applies — frontend/UI, database, a specific framework or platform — and load it first. The spec tells you what to build; those skills tell you the house rules for building it.
 
-Use /tdd where possible. A seam recorded in the spec or an implementation contract is already pre-agreed; do not ask the user to confirm it again.
+Classify TDD applicability before editing. Mark it `required` for every change to executable behaviour, including migrations, CLI or API contracts, bug fixes, and integration repairs. Mark it `not_applicable` only when the work has no executable seam, such as a pure documentation or inert metadata change, and record the reason before implementation starts. An implementation agent may not grant itself an exception after work begins.
+
+When TDD is required, invoke `/tdd` before the first implementation edit and follow its vertical red → green loop at every pre-agreed seam. Retain the exact RED command and intended behavioural failure plus the GREEN command and result for handoff. A seam recorded in the spec or an implementation contract is already pre-agreed; do not ask the user to confirm it again.
 
 Treat a known source spec and ticket as the semantic and evidence contract. Validate it, then bind it to current commands, data, and repository state; do not recreate missing acceptance meanings, invariants, stateful outcomes, or evidence requirements inside implementation.
 
@@ -28,8 +30,8 @@ When the user resolves one, record the exact choice, its affected scope, and wha
 ## Direct mode
 
 1. Resolve and record the exact base commit before editing.
-2. Validate any known source contract and bind its acceptance, invariant, stateful-boundary, and evidence requirements to exact focused checks. Return semantic gaps upstream instead of filling them here.
-3. Drive the behaviour red → green at the pre-agreed seams. Run focused tests and changed-area static checks regularly.
+2. Validate any known source contract, classify TDD applicability, and bind its acceptance, invariant, stateful-boundary, and evidence requirements to exact focused checks. Return semantic gaps upstream instead of filling them here.
+3. When TDD is required, invoke `/tdd` before editing and drive each vertical slice red → green at the pre-agreed seams, retaining exact RED and GREEN evidence. Run focused tests and changed-area static checks regularly.
 4. Perform a concise self-review against the acceptance criteria, invariants, scope, evidence requirements, and final diff. Make bounded cleanup while the tests are green.
 5. Run the full relevant test suite once.
 6. Commit the work, then confirm the worktree is clean.

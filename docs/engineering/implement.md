@@ -30,7 +30,7 @@ Before each wave, the root validates the upstream handoff: source acceptance ass
 
 ## Direct mode
 
-Direct mode keeps one bounded change tight. When a source spec or ticket exists, it validates and binds that contract before focused red-green cycles; it does not fill semantic gaps during coding. Changed-area static checks, a concise self-review, one full relevant suite, and a clean commit lead into independent Standards and Spec review against the committed tree, never an invisible working-copy diff.
+Direct mode keeps one bounded change tight. When a source spec or ticket exists, it validates and binds that contract before focused red-green cycles; it does not fill semantic gaps during coding. Every executable change loads TDD before editing and retains exact RED and GREEN evidence; only work with no executable seam can receive an exception recorded in advance. Changed-area static checks, a concise self-review, one full relevant suite, and a clean commit lead into independent Standards and Spec review against the committed tree, never an invisible working-copy diff.
 
 ## Wave mode
 
@@ -42,7 +42,7 @@ Evidence strength arrives from the spec through the tickets. A synthetic fixture
 
 Before parallel work begins, the root allocates mechanical values for declared namespace needs such as migration versions, contract identifiers, CLI commands, and artifact paths. Product-facing names remain upstream decisions. Reasoning effort follows semantic risk rather than ticket size, with the highest effort reserved for concurrency, crash consistency, destructive migration rehearsals, and counterfactual replay. Every implementation and review dispatch carries that effort explicitly while keeping the current model unless an override is required; a full-history fork or inherited effort is an invalid dispatch.
 
-Every ticket gets its own fresh context, worktree, ownership boundary, acceptance criteria, focused gates, reasoning effort, and clean-commit requirement. A ticket agent is a Wave worker, not a nested `/implement` Direct-mode run: it may use TDD and domain skills, but it does not launch independent review. The root integrates one complete wave, runs the full relevant gates once, and bases the next wave on the accepted integrated commit.
+Every ticket gets its own fresh context, worktree, ownership boundary, acceptance criteria, focused gates, reasoning effort, and clean-commit requirement. A ticket agent is a Wave worker, not a nested `/implement` Direct-mode run: for executable behaviour it must load TDD before editing and return valid per-slice RED and GREEN evidence, but it does not launch independent review. TDD exceptions are root-owned, fixed before dispatch, and limited to work with no executable seam. The root integrates one complete wave, runs the full relevant gates once, and bases the next wave on the accepted integrated commit.
 
 Once the tree is stable, one independent Standards reviewer and one independent Spec reviewer inspect that wave's immutable delta from the previous accepted head. The original implementation base remains fixed for provenance and one final cumulative review, instead of being reread after every wave. Expensive benchmarks and migration rehearsals wait until the applicable reviews accept.
 
