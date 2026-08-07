@@ -1,6 +1,6 @@
 ## What it does
 
-`setup-matt-pocock-skills` answers three questions about one repo — where issues live, what the triage labels are called, and where the domain docs sit — and records the answers as markdown files under `docs/agents/`.
+`setup-matt-pocock-skills` answers four questions about one repo — where issues live, what the triage labels are called, where the domain docs sit, and which agent roles the build skills dispatch to — recording the first three as markdown files under `docs/agents/` and installing the fourth into the project's harness config.
 
 Those files are the only thing that varies between repos. The skills themselves are identical everywhere; they read `docs/agents/issue-tracker.md` at run time and do what it says. That is why the set is not tied to GitHub, and why no skill file ever needs editing to point it somewhere else. Invoking it with "link the skills to a custom issue tracker" works with anything you can connect to programmatically, with zero changes to the skills.
 
@@ -22,10 +22,11 @@ It writes into the repo you run it in:
 | `domain.md` | `docs/agents/` |
 | `triage-labels.md` | `docs/agents/`, only when the `triage` skill is installed |
 | An `## Agent skills` block | whichever of `CLAUDE.md` / `AGENTS.md` already exists |
+| `implementer` / `reviewer` agent roles | `.claude/agents/`, `.codex/agents/`, `.opencode/agents/` — for the harnesses you use |
 
-All of it is committed markdown. There is no user-level or global mode: the config lives in the repo, so every repo gets its own copy.
+All of it is committed config. There is no user-level or global mode: the config lives in the repo, so every repo gets its own copy — including the agent roles, which [implement](https://aihero.dev/skills-implement) and [code-review](https://aihero.dev/skills-code-review) dispatch to by name. Each project can tune its own copies (model, effort, permissions), and a re-run never overwrites an existing role definition.
 
-## The three decisions
+## The four decisions
 
 It leads each section with the recommended answer, and skips whatever exploration already settled. Most runs are two confirmations and done.
 
@@ -34,6 +35,7 @@ It leads each section with the recommended answer, and skips whatever exploratio
 | **Issue tracker** | the one matching your `git remote` | always — this is the one real choice |
 | **Triage labels** | keep the five canonical names (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) | only if the `triage` skill is installed |
 | **Domain docs** | single-context: one `CONTEXT.md` plus `docs/adr/` at the root | only if it spots monorepo signals, and then it offers a multi-context `CONTEXT-MAP.md` |
+| **Agent roles** | install `implementer` and `reviewer` for the harnesses it detects in use | it proposes the detected set; existing definitions are reported, never overwritten |
 
 The tracker options:
 
@@ -71,7 +73,7 @@ It doesn't. `docs/agents/triage-labels.md` is a *mapping* — it tells `/triage`
 
 **Can I configure the other skills' behaviour here — [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) cadence, question format, tone?**
 
-No. It configures three things: tracker, labels, doc layout. There have been direct requests to make it the home for per-user preferences, and the standing answer is that skills stay opinionated: *"Config is death."* Preferences belong in your `CLAUDE.md` as plain instructions, which every skill already reads.
+No. It configures four things: tracker, labels, doc layout, agent roles. There have been direct requests to make it the home for per-user preferences, and the standing answer is that skills stay opinionated: *"Config is death."* Preferences belong in your `CLAUDE.md` as plain instructions, which every skill already reads.
 
 **Can I keep the config in `~/.claude` instead of committing it to every repo?**
 

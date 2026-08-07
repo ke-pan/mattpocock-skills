@@ -19,7 +19,7 @@ Type `/code-review`, or the agent reaches for it automatically when you ask to r
 
 You must supply the fixed point. If you do not, the skill asks for one rather than guessing; it then checks the ref resolves and the diff is non-empty before spawning anything, so a typo'd branch name fails in front of you instead of inside two sub-agents.
 
-Both axes dispatch to the agent role named `reviewer` when the harness defines it — the repo ships that role for Claude Code, Codex, and OpenCode under `.claude/agents/`, `.codex/agents/`, and `.opencode/agents/`, linked into user scope by `scripts/link-agents.sh`. The role pins the reviewer to read-only behaviour with its own model and effort defaults; without it, the harness's default sub-agent mechanism is used and noted.
+Both axes dispatch to the agent role named `reviewer` when the project defines it — [setup-matt-pocock-skills](https://aihero.dev/skills-setup-matt-pocock-skills) installs that role for Claude Code, Codex, and OpenCode into the project's `.claude/agents/`, `.codex/agents/`, and `.opencode/agents/`, and each project can tune its own copy. The role pins the reviewer to read-only behaviour with its own model and effort defaults; without it, the harness's default sub-agent mechanism is used and noted.
 
 ## Prerequisites
 

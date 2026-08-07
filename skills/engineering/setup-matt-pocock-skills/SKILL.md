@@ -1,6 +1,6 @@
 ---
 name: setup-matt-pocock-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.
+description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, domain doc layout, and per-project agent roles. Run once before first use of the other engineering skills.
 disable-model-invocation: true
 ---
 
@@ -11,6 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker** — where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Agent roles** — the `implementer` and `reviewer` role definitions that `/implement` and `/code-review` dispatch to, installed into this project's harness config so each project can tune its own copies
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -28,6 +29,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
+- Harness signals for agent roles — which of `.claude/`, `.codex/`, `.opencode/` (or their config files) already exist in the project, and whether any of `.claude/agents/`, `.codex/agents/`, `.opencode/agents/` already contains an `implementer` or `reviewer` definition.
 
 ### 2. Present findings and ask
 
@@ -59,6 +61,18 @@ The defaults are the five canonical roles, each label string equal to its name: 
 **Section C — Domain docs.** Default to **single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. This fits almost every repo; write it without asking.
 
 Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals. Then confirm which layout they want.
+
+**Section D — Agent roles.**
+
+> Explainer: `/implement` (Wave mode) and `/code-review` dispatch work to agent roles named `implementer` and `reviewer`. The definitions live in the project — `.claude/agents/` (Claude Code), `.codex/agents/` (Codex), `.opencode/agents/` (OpenCode) — so each project can tune model, effort, and permissions independently. Without them, the skills fall back to the harness's default sub-agent mechanism.
+
+Propose installing the role definitions for the harnesses exploration detected in use (recommend all detected; offer the full list if none were detected). Copy the seed templates from this skill's [agent-roles/](./agent-roles/) folder into the project:
+
+- `agent-roles/claude/*.md` → `.claude/agents/`
+- `agent-roles/codex/*.toml` → `.codex/agents/`
+- `agent-roles/opencode/*.md` → `.opencode/agents/`
+
+Never overwrite an existing `implementer` or `reviewer` definition — an existing file is a project customization; report it and leave it alone. After installing, mention that harnesses may need a restart to pick up new agent definitions.
 
 ### 3. Confirm and edit
 
@@ -113,4 +127,4 @@ For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch us
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` and the installed agent-role files directly later — re-running this skill is only necessary if they want to switch issue trackers, install roles for another harness, or restart from scratch.
