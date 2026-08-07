@@ -6,7 +6,7 @@ description: Review committed changes between fixed points along two independent
 Review one committed diff along two independent axes:
 
 - **Standards** — does the code conform to this repo's documented coding standards?
-- **Spec** — does the code faithfully implement the originating issue, PRD, or spec?
+- **Spec** — does the code faithfully implement the originating issue or spec?
 
 Run both axes as independent parallel reviewers so they do not pollute each other's context. This skill is read-only: reviewers report; they do not edit.
 
@@ -44,7 +44,7 @@ Look for the originating spec in this order:
 
 1. A spec path, issue, or fetched contents supplied by the user or calling workflow.
 2. Issue references in the reviewed commit messages — fetch them via `docs/agents/issue-tracker.md`.
-3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch or feature.
+3. A spec file under `docs/`, `specs/`, or `.scratch/` matching the branch or feature.
 4. If nothing is found, ask the user where the spec is.
 
 If no spec exists, skip the Spec reviewer and report `NOT_RUN — no spec available`. Do not treat a missing Spec review as acceptance.
