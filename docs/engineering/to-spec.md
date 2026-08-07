@@ -25,13 +25,24 @@ Reach for it when the build is too big for one agent [session](https://www.aiher
 
 The spec exists because context windows end. Everything you settled while [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) — the shape of the solution, the choices you argued through, what you deliberately refused — is in one conversation that is about to be cleared. The spec is what survives that.
 
-So it does not validate anything, and it does not decide anything. It captures what was decided, in your project's own vocabulary, so that a fresh session can pick the work up without you re-explaining it. Anything the spec asserts that you never actually said is a defect.
+So it does not decide anything. It captures what was decided, in your project's own vocabulary, so that a fresh session can pick the work up without you re-explaining it. Anything the spec asserts that you never actually said is a defect. The one check it does run is for consistency: settled decisions are compared against the ADRs, existing behaviour, and compatibility promises they touch, and a real contradiction stops the publish and gets reported instead of being silently resolved.
 
 ## Seams before prose
 
 Before it writes a word, `to-spec` sketches the **seams** the feature will be tested at, and checks them with you. It prefers seams that already exist to new ones, and takes the highest seam it can — the ideal number across a change is one.
 
 Those agreed seams then travel. [tdd](https://aihero.dev/skills-tdd) works only at pre-agreed seams, and [code-review](https://aihero.dev/skills-code-review) reviews the diff against the spec, so a seam nobody agreed to shows up as a review finding. The binding is indirect — it runs through this document — which is exactly why the seam conversation is worth taking seriously here rather than deferring it to implementation.
+
+## The implementation contract
+
+Beyond the prose, the spec carries a contract with stable IDs, so downstream skills can track ownership without re-deriving meaning:
+
+- **Acceptance assertions** (`A1`, `A2`, …) — observable outcomes, not implementation tasks. Each must later be owned by at least one ticket.
+- **Invariants** (`I1`, …) — truths every implementation slice must preserve: compatibility guarantees, ordering constraints, meanings that must not be conflated.
+- **Stateful boundaries** (`S1`, …) — the high-risk edges (crash between writes, concurrent publication, retry ownership) and their expected external outcome.
+- **Evidence contract** — for claims that ordinary automated tests can't prove, the required evidence class: `synthetic fixture`, `retained production data`, `bounded live sample`, or `production observation`.
+
+[to-tickets](https://aihero.dev/skills-to-tickets) builds its coverage ledger from these IDs, and [implement](https://aihero.dev/skills-implement) validates them before writing code — semantic gaps found downstream come back here rather than being filled in on the spot.
 
 ## Common questions
 

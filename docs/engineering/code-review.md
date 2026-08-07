@@ -1,8 +1,8 @@
 ## What it does
 
-`code-review` reviews the diff between `HEAD` and a fixed point you name — a commit, a branch, a tag, `main`, `HEAD~5` — along two axes. **Standards** asks whether the code follows how this repo writes code. **Spec** asks whether the code does what the originating issue or [spec](https://www.aihero.dev/ai-coding-dictionary/spec) asked for. Each axis runs in its own [sub-agent](https://www.aihero.dev/ai-coding-dictionary/subagent) so neither sees the other's reasoning.
+`code-review` reviews one committed range between fixed points — a base you name (a commit, a branch, a tag, `main`, `HEAD~5`) and the committed head — along two axes. The range is pinned to exact SHAs before anything is spawned, so both reviewers inspect the same immutable tree. **Standards** asks whether the code follows how this repo writes code. **Spec** asks whether the code does what the originating issue or [spec](https://www.aihero.dev/ai-coding-dictionary/spec) asked for. Each axis runs in its own [sub-agent](https://www.aihero.dev/ai-coding-dictionary/subagent) so neither sees the other's reasoning.
 
-The two axes are never merged and never re-ranked. The report ends with a worst issue *per axis* and refuses to name a single winner across them, because a change can pass one axis and fail the other: code that follows every convention while implementing the wrong thing passes Standards and fails Spec; code that does exactly what the [ticket](https://www.aihero.dev/ai-coding-dictionary/ticket) asked while breaking the repo's conventions does the reverse. A blended verdict lets the passing axis hide the failing one.
+The two axes are never merged and never re-ranked. Each axis returns its own explicit verdict, and the report refuses to name a single winner across them, because a change can pass one axis and fail the other: code that follows every convention while implementing the wrong thing passes Standards and fails Spec; code that does exactly what the [ticket](https://www.aihero.dev/ai-coding-dictionary/ticket) asked while breaking the repo's conventions does the reverse. A blended verdict lets the passing axis hide the failing one. When a blocker is fixed, the fix is committed and the same reviewer inspects the fix delta — a targeted re-review, not a fresh full pass.
 
 ## When to reach for it
 
@@ -57,11 +57,11 @@ Known open bug, reproduced by several people and in more than one harness. The S
 
 **Should I run it in the same [session](https://www.aihero.dev/ai-coding-dictionary/session) that wrote the code?**
 
-Prefer a fresh one. As one reader put it: "Same context reviewing itself isn't review, it's confirmation bias with a slash command." The reviewing agent in the authoring session holds every assumption that shaped the code, which is exactly the context an independent reviewer would not have. This is also why people ask for [implement](https://aihero.dev/skills-implement) without its built-in review step — it runs the review inside the session that just wrote the diff. Invoking `/code-review` yourself from a clean session is the honest version.
+Prefer a fresh one. As one reader put it: "Same context reviewing itself isn't review, it's confirmation bias with a slash command." The reviewing agent in the authoring session holds every assumption that shaped the code, which is exactly the context an independent reviewer would not have. [implement](https://aihero.dev/skills-implement) respects this: the implementing agent schedules independent reviewers through this skill and never acts as either axis itself. Invoking `/code-review` yourself from a clean session works the same way.
 
 **After every ticket, or once at the end?**
 
-Both work, and the skill does not decide for you. Per-ticket keeps each diff small enough that the Spec axis has one clear spec to check against, which is the mode `implement` uses. Batching to the end of a branch catches interactions between tickets that the per-ticket passes each miss. If you are unsure, review per ticket and run one final pass against the branch point.
+Both work, and the skill does not decide for you. Per-ticket keeps each diff small enough that the Spec axis has one clear spec to check against, which is what `implement`'s Direct mode does. Batching to the end of a branch catches interactions between tickets that the per-ticket passes each miss — `implement`'s Wave mode does both, reviewing each integrated wave delta and one final cumulative range. If you are dispatching by hand and unsure, review per ticket and run one final pass against the branch point.
 
 **Can I trust the findings?**
 
@@ -73,21 +73,21 @@ Because fixes create new surface, and because the judgement-call half of the Sta
 
 **Does it review my uncommitted work?**
 
-No. It diffs `<fixed-point>...HEAD`, three-dot, which is measured from the merge-base and excludes staged and working-tree changes. If `implement` has not made an interim commit, the work about to be committed is invisible to the review. Commit first, then review, then amend or add a fixup.
+No. It reviews committed trees only — staged and working-tree changes are invisible to it, and the range is pinned to exact SHAs so the evidence stays tied to the commit that produced it. `implement` commits before it reviews for exactly this reason. If you are invoking it yourself, commit first, then review; a blocker fix goes in as a new commit and gets a targeted re-review of the fix delta.
 
 ## It's working if
 
 - It refuses to start on a bad ref or an empty diff, before any sub-agent is spawned.
 - The report arrives as two separate blocks under `## Standards` and `## Spec`, not one merged list.
 - Every Standards finding names either a rule in one of your repo's files or one of the twelve smells, with the hunk quoted; every Spec finding quotes a line of the spec.
-- The closing summary gives a worst issue per axis and declines to pick an overall winner.
+- The closing summary gives an explicit verdict and worst issue per axis, and declines to pick an overall winner.
 - With no spec available, the Spec block says so instead of listing requirements it inferred from the code.
 
 ## Where it fits
 
 `code-review` is the review step at the tail of the build chain — `grill-with-docs → to-spec → to-tickets → implement → code-review` — and also stands alone on any branch or PR you point it at.
 
-- [implement](https://aihero.dev/skills-implement) is the closest neighbour: it drives the build and calls this skill as its own closing review before committing.
+- [implement](https://aihero.dev/skills-implement) is the closest neighbour: it drives the build, commits, and then calls this skill against the committed range as its closing review.
 - [to-spec](https://aihero.dev/skills-to-spec) and [to-tickets](https://aihero.dev/skills-to-tickets) produce the document the Spec axis checks against; a vague spec makes that axis vague.
 - [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) is the whole-codebase counterpart — this skill only ever looks at one diff.
 

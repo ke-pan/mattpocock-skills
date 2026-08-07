@@ -28,7 +28,7 @@ A **horizontal** slice ships one layer of the change. Nothing works until every 
 
 This is the rule people break most often, and the consequences are well documented. One team ran a 26-ticket stack sliced by layer — corpus, producer, aggregator, selector — and got roughly twenty agent runs per closed ticket, about three quarters of them rework. Their own post-mortem traced every failure class back to the horizontal slicing rather than to the implementations.
 
-Two things happen before anything is published. `to-tickets` looks for prefactoring — "make the change easy, then make the easy change" — and orders that work first. Then it presents the breakdown as a numbered list and quizzes you on it: is the granularity right, are the blocking edges real, should anything merge or split. Nothing reaches the tracker until you approve, and that quiz is the place to push back.
+Three things happen before anything is published. `to-tickets` looks for prefactoring — "make the change easy, then make the easy change" — and orders that work first. It builds a **coverage ledger** from the spec's contract: every acceptance assertion assigned to at least one ticket, every invariant attached to each ticket that can affect it, every stateful boundary given an end-to-end owner, and each evidence class carried unchanged into the owning criterion. Then it presents the breakdown as a numbered list, with a coverage summary whose gap categories must all be empty, and quizzes you on it: is the granularity right, are the blocking edges real, should anything merge or split. Nothing reaches the tracker until you approve, and that quiz is the place to push back.
 
 ## Blocking edges
 
@@ -77,7 +77,7 @@ A very large spec can outgrow what a tracker issue serves back cleanly, and ther
 The template asks for criteria and says nothing about whether they can fail, so this happens. Three shapes recur: a criterion already true at the base commit, a criterion that can only be satisfied by work another ticket owns, and one that restates the request rather than deriving from the artifact. Vertical slicing prevents most of it — a slice that delivers behaviour which didn't exist before is red at the base commit by construction — but the check is worth doing by hand. For each criterion, name the observation that would show it false, and confirm it fails at the commit the implementer starts from.
 
 **The tickets are published. How do I actually run them?**
-The skill stops at the artifact, and there is no auto-dispatch mode. Dispatch is manual: look at the board, count the tickets with no open blockers, and open that many agent sessions. One ticket per fresh context, cleared between them. Be aware that [implement](https://aihero.dev/skills-implement) does not reliably close or check off the ticket when it finishes, on GitHub or in local markdown, so the ticket's state is yours to update.
+The skill stops at the artifact — running it belongs to [implement](https://aihero.dev/skills-implement). Hand the whole ticket set to one `/implement` invocation and its Wave mode works the graph: an isolated agent per unblocked ticket, integration and review per wave, from a single root session. For a lone ticket, `/implement #<n>` in a fresh context is Direct mode. Don't open uncoordinated sessions against the same checkout — they share one working directory and one HEAD. Ticket state on the tracker closes via the commit's `Closes` reference when it reaches the default branch; anything the tracker convention doesn't cover is yours to update.
 
 ## It's working if
 
@@ -96,4 +96,4 @@ The skill stops at the artifact, and there is no auto-dispatch mode. Dispatch is
 grill-with-docs → to-spec → to-tickets → implement → code-review
 ```
 
-Upstream is [to-spec](https://aihero.dev/skills-to-spec), which hands it a settled spec to slice against — keep both in one unbroken context window. Downstream is [implement](https://aihero.dev/skills-implement), which builds one ticket per fresh session, driving [tdd](https://aihero.dev/skills-tdd) for the tests and closing with [code-review](https://aihero.dev/skills-code-review). When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
+Upstream is [to-spec](https://aihero.dev/skills-to-spec), which hands it a settled spec to slice against — keep both in one unbroken context window. Downstream is [implement](https://aihero.dev/skills-implement), which takes the ticket set in Wave mode (or one ticket in Direct mode), driving [tdd](https://aihero.dev/skills-tdd) for the tests and closing with [code-review](https://aihero.dev/skills-code-review). When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
