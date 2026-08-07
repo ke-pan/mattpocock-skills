@@ -34,11 +34,8 @@ Keep integration under the root agent's ownership.
    - semantic failure after transport success.
 9. Reserve the mechanical values for declared shared namespace needs: migration and schema versions, contract identifiers, ports, CLI commands, asset names, and artifact paths. The root resolves mechanical collisions; when a resolution changes a public interface or product semantics, return it to the spec or user. Ticket agents do not claim unreserved shared identifiers independently.
 10. Check whether the wave can be given clear ownership. When two tickets cannot run without negotiating the same semantics or files, pause for re-slicing or a real dependency decision; never invent a blocker just to make scheduling easier.
-11. Classify reasoning effort by semantic risk, not ticket size:
-    - `medium` for bounded local UI, API, or schema-neutral work without shared persistent semantics;
-    - `high` for external integrations, solver behaviour, lifecycle state, retention, additive compatibility migrations, or cross-module behaviour;
-    - `xhigh` for concurrency, crash consistency, destructive migration rehearsal, counterfactual replay, or several interacting invariants.
-12. Classify root-scheduled implementation, repair, Spec-review, and Standards-review agents individually, then bind each classification as far as the harness allows. Dispatch to the agent role named `implementer` (implementation and repair) or `reviewer` (either review axis) when the harness resolves that role from project or user scope; the role definition carries the default model and effort. Where the spawn mechanism also exposes an explicit effort or model parameter, pass the classified value; where it does not, the role default applies. Record the actual binding — `explicit`, `role-default`, or `unavailable` — in the run ledger. Never fabricate a runtime setting that was not actually applied.
+11. Dispatch every root-scheduled implementation, repair, Spec-review, and Standards-review agent to its named role: `implementer` for implementation and repair, `reviewer` for either review axis, when the harness resolves that role from project or user scope. The role definition carries the model and effort — tune them per project in the role file, not per spawn. Apply a per-spawn model or effort override only when the user or repository explicitly requires one, and record any override actually applied. Never fabricate a runtime setting that was not actually applied.
+12. Risk handling reads the contract, not a separate classification: a ticket's declared stateful boundaries and required evidence classes are its risk register. Schedule tickets owning stateful boundaries or destructive-migration evidence conservatively — their own wave, or serial against tickets touching overlapping semantics — and point Stable-tree review's attention at them.
 13. Plan harness capacity so the root remains available and Stable-tree review can use independent Spec and Standards reviewers. Only the root schedules those reviewers.
 
 For access or compliance tickets, verify that the inherited contract keeps technical capability, price, terms or authorization, permitted credentials, bounded-validation limits, and production activation permission separate. Enforce those boundaries; do not reinterpret them during implementation.
@@ -56,7 +53,7 @@ Wave N:
 - <ticket and delivery>
 
 Dispatch:
-- <ticket> — agent role <implementer | harness-default fallback>; effort <medium|high|xhigh> (<explicit|role-default|unavailable>); TDD <required at confirmed seams | not_applicable because no executable seam>
+- <ticket> — agent role <implementer | harness-default fallback>; stateful boundaries <S-IDs | none>; TDD <required at confirmed seams | not_applicable because no executable seam>
 
 Blocked for later:
 - <ticket> by <blocker>
@@ -85,7 +82,7 @@ Keep run-specific truth outside the conversation history. Before the first spawn
 The root agent is the sole writer. Record:
 
 - the spec or ticket set, integration target, immutable `implementation_base_sha`, current `wave_base_sha`, latest verified `integrated_sha`, and latest accepted wave head;
-- every dispatch's agent handle, ticket, agent role used (`implementer`, `reviewer`, or the named fallback mechanism), model binding, planned reasoning effort, and the actual effort binding (`explicit`, `role-default`, or `unavailable`);
+- every dispatch's agent handle, ticket, agent role used (`implementer`, `reviewer`, or the named fallback mechanism), and any explicitly applied model or effort override;
 - every ticket's root-classified TDD applicability, any pre-dispatch exception reason, confirmed seams, and exact RED/GREEN evidence for each completed vertical slice;
 - confirmed decisions as append-only entries with the full chosen meaning, affected scope, original user confirmation, and any decision they supersede;
 - wave and ticket status with bases, commit SHAs, gates, and review verdicts;
@@ -107,9 +104,8 @@ Before allowing a spawned agent to work, enforce this dispatch gate:
 1. Dispatch to the agent role named `implementer` when the harness resolves it; otherwise use the harness's default isolated sub-agent mechanism and record the fallback by name. Never silently substitute a different role.
 2. Contract-only context: the spawned agent starts from the complete narrow contract below, never from forked conversation history. If the harness offers history-inheriting spawn modes, do not use them for ticket work; when a contract depends on an immediately preceding user decision, copy that decision into the contract instead.
 3. Omit any per-spawn model override unless the user, repository, or task requires a different model; omission deliberately uses the role's or session's model resolution.
-4. Bind the classified reasoning effort per preflight step 12 and record the binding. A `role-default` or `unavailable` binding is conforming when recorded; an unrecorded one is not.
-5. Require the contract to carry root-classified TDD applicability, confirmed seams, and any pre-dispatch exception. If executable behaviour is marked `not_applicable`, stop and repair the contract before spawning.
-6. Record the spawn's role, bindings, and returned agent handle in the run ledger. If a spawn inherited conversation history, its binding went unrecorded, or TDD applicability is missing, interrupt the invalid dispatch and relaunch it before accepting work.
+4. Require the contract to carry root-classified TDD applicability, confirmed seams, and any pre-dispatch exception. If executable behaviour is marked `not_applicable`, stop and repair the contract before spawning.
+5. Record the spawn's role (or named fallback), any explicitly applied override, and the returned agent handle in the run ledger. If a spawn inherited conversation history, its role went unrecorded, or TDD applicability is missing, interrupt the invalid dispatch and relaunch it before accepting work.
 
 A Wave ticket agent executes this contract directly. Do not pass it the original user `/implement` invocation or ask it to select an execution shape; it is not a nested Direct-mode run. When TDD is required, it must invoke `/tdd` before its first implementation edit. It may invoke other applicable model-invoked domain skills, but the root alone invokes `/code-review` after integration.
 
@@ -134,7 +130,6 @@ TDD exception reason: none | <root-owned pre-dispatch reason>
 Confirmed test seams:
 Focused test commands:
 Changed-area static checks:
-Classified reasoning effort: medium | high | xhigh (binding recorded by root)
 
 Required return:
 - commit SHA and concise commit summary
@@ -199,7 +194,7 @@ Test and review evidence belongs to the exact commit that produced it. A code ch
 After every implementation wave and ordinary gate is stable:
 
 1. Pin `review_base_sha` to this wave's immutable `wave_base_sha` and `review_head_sha` to the final integrated commit. Do not use the original `implementation_base_sha` for every wave.
-2. Run /code-review once, supplying those immutable SHAs, the classified effort for each axis, and reviewers who did not author the implementation — the `reviewer` agent role where the harness resolves it. Let /code-review launch the Spec and Standards reviewers concurrently under its fresh-context dispatch gate.
+2. Run /code-review once, supplying those immutable SHAs and reviewers who did not author the implementation — the `reviewer` agent role where the harness resolves it. Let /code-review launch the Spec and Standards reviewers concurrently under its fresh-context dispatch gate.
 3. Supply any confirmed ledger decisions that affect the reviewed behaviour but are not yet reflected in the spec or tickets.
 4. Require the reviewers to inspect the inherited source-to-ticket coverage, runtime evidence bindings, and declared stateful seams as well as the diff.
 5. Keep the root review focused on integration seams, shared namespaces, commit provenance, and disagreement between reviewers.
@@ -232,7 +227,7 @@ When the inherited evidence contract requires retained production data, use the 
 
 After review and expensive acceptance:
 
-1. Run one final cumulative /code-review from immutable `implementation_base_sha` to the final accepted wave head, with the classified effort for both axes bound and recorded as in every dispatch. If that exact range and tree already received both accepted verdicts, reuse them instead of duplicating the review.
+1. Run one final cumulative /code-review from immutable `implementation_base_sha` to the final accepted wave head. If that exact range and tree already received both accepted verdicts, reuse them instead of duplicating the review.
 2. Repair any blocker with the bounded-fix and targeted-re-review rules, rerunning ordinary or expensive evidence invalidated by the fix.
 3. Advance the user-approved final target to the accepted commit.
 4. Run one final repository-wide gate on the final target.
@@ -240,6 +235,6 @@ After review and expensive acceptance:
 6. Audit every commit after `implementation_base_sha` for known source provenance.
 7. Confirm the target and every retained worktree are clean and contain no unexpected artifacts.
 8. Mark the run ledger complete and retain or archive it according to the repository's scratch policy.
-9. Report the implementation base, per-wave ranges and integrated commits, final cumulative review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker. Include `unrecorded_binding_spawn_count`, `history_inheriting_spawn_count`, `missing_red_evidence_count`, and every TDD exception; all three counts must be zero for a conforming run.
+9. Report the implementation base, per-wave ranges and integrated commits, final cumulative review verdicts, acceptance evidence, final gate, and whether anything was pushed or changed on the tracker. Include `unrecorded_role_spawn_count`, `history_inheriting_spawn_count`, `missing_red_evidence_count`, and every TDD exception; all three counts must be zero for a conforming run.
 
 Never push or mutate tracker state without explicit user authorization.
