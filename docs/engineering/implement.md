@@ -59,6 +59,8 @@ Partly expected. `implement` never changes tracker state directly — it does no
 
 Yes — that is what Wave mode is for. Invoke `/implement` once with the ticket set and one root session coordinates the graph: it dispatches an isolated agent per unblocked ticket, each in its own git worktree, then integrates and reviews the wave before opening the next. The ticket agents execute root-owned contracts rather than recursively invoking `/implement`, which is what keeps the fan-out bounded.
 
+Dispatch goes to a named agent role: `implementer` for ticket work, `reviewer` for the review axes. The repo ships the same two roles in all three harness dialects — `.claude/agents/` (Claude Code), `.codex/agents/` (Codex), `.opencode/agents/` (OpenCode) — with model and effort defaults living in the role definition rather than in skill prose; `scripts/link-agents.sh` links them into the user-level agent directories. On a harness where the role doesn't resolve, dispatch falls back to the default sub-agent mechanism and the run ledger records the fallback.
+
 What remains unsupported is launching several *uncoordinated* `/implement` sessions side by side in one checkout. That is worse than unsupported: one field report describes a `git commit --amend` in one session landing on another session's commit, a stash vanishing from `refs/stash`, and commits landing on the wrong branch, all in a single afternoon across three issues. The sessions share one working directory, one index, and one HEAD. If the work is a graph, hand the whole graph to one Wave-mode root instead.
 
 **Can it open a pull request instead of committing?**

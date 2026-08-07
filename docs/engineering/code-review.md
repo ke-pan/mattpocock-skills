@@ -19,6 +19,8 @@ Type `/code-review`, or the agent reaches for it automatically when you ask to r
 
 You must supply the fixed point. If you do not, the skill asks for one rather than guessing; it then checks the ref resolves and the diff is non-empty before spawning anything, so a typo'd branch name fails in front of you instead of inside two sub-agents.
 
+Both axes dispatch to the agent role named `reviewer` when the harness defines it — the repo ships that role for Claude Code, Codex, and OpenCode under `.claude/agents/`, `.codex/agents/`, and `.opencode/agents/`, linked into user scope by `scripts/link-agents.sh`. The role pins the reviewer to read-only behaviour with its own model and effort defaults; without it, the harness's default sub-agent mechanism is used and noted.
+
 ## Prerequisites
 
 The Standards axis needs nothing. It reads whatever the repo documents (`CODING_STANDARDS.md`, `CONTRIBUTING.md`, and the like) and falls back on a built-in baseline when the repo documents nothing.

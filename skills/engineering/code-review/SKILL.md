@@ -72,11 +72,11 @@ Repository standards override the baseline. Tool-enforced style is outside revie
 
 ### 4. Launch independent reviewers
 
-Launch Standards and Spec reviewers who did not author the reviewed implementation, concurrently using the harness's available sub-agent mechanism. Give both the same `review_base_sha`, `review_head_sha`, `review_head_tree_sha`, diff command, and commit list. Record each reviewer identity or session handle for possible follow-up.
+Launch Standards and Spec reviewers who did not author the reviewed implementation, concurrently. Dispatch each axis to the agent role named `reviewer` when the harness resolves it from project or user scope; otherwise use the harness's default isolated sub-agent mechanism and note the fallback. Give both the same `review_base_sha`, `review_head_sha`, `review_head_tree_sha`, diff command, and commit list. Record each reviewer identity or session handle for possible follow-up.
 
 Classify each axis's reasoning effort before dispatch. Use an effort supplied by the calling workflow when present; otherwise use `medium` for a bounded local diff, `high` for lifecycle, retention, additive migrations, external integration, or cross-module behaviour, and `xhigh` only for concurrency, crash consistency, destructive migration rehearsal, counterfactual replay, or several interacting invariants.
 
-Dispatch each reviewer with `fork_turns: "none"` and the complete review brief, and pass its classified `reasoning_effort` explicitly. Omit the model override unless the user, repository, or calling workflow requires one. Never use a full-history fork or inherited effort. Record the exact spawn arguments with the reviewer handle; if the effort is absent or mismatched, interrupt and relaunch before accepting a verdict.
+Dispatch each reviewer from its complete review brief alone — never from forked conversation history. The `reviewer` role definition carries the default model and effort; where the spawn mechanism exposes an explicit effort or model parameter, pass the classified value, and otherwise the role default applies. Omit any model override unless the user, repository, or calling workflow requires one. Record the role (or named fallback), the actual binding — `explicit`, `role-default`, or `unavailable` — and the reviewer handle; if a reviewer inherited conversation history or its binding went unrecorded, interrupt and relaunch before accepting a verdict. Never report a runtime setting that was not actually applied.
 
 Give the **Standards reviewer**:
 
